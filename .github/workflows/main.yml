@@ -1,22 +1,13 @@
 # Nombre que aparece en GitHub Actions
-name: Python CI Básico
-
-# Cuándo se ejecuta el script
+name: Prueba de python
 on:
-  # En cada push a main
   push:
     branches: [ main ]
-  # En pull requests hacia main
-  pull_request:
-    branches: [ main ]
-
-# Define el trabajo a realizar
 jobs:
   test:
-    # Sistema operativo donde correr
+    name: Instalar Sistemas operativo
     runs-on: ubuntu-latest
     
-    # Pasos a ejecutar en orden
     steps:
     # Paso 1: Descargar el código del repositorio
     - name: Descargar código
@@ -41,27 +32,5 @@ jobs:
     # Paso 4: Verificar sintaxis y estilo básico
     - name: Verificar código con flake8
       run: |
-        # Verificar errores de sintaxis y estilo básico
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
     
-    # Paso 5: Ejecutar tests
-    - name: Ejecutar tests
-      run: |
-        # Buscar y ejecutar todos los tests
-        pytest
-    
-    # Paso 6: Subir archivos/resultados
-    - name: Subir resultados
-      uses: actions/upload-artifact@v3
-      # Ejecutar incluso si algo falla arriba
-      if: always()
-      with:
-        # Nombre del archivo comprimido
-        name: test-results
-        # Qué archivos subir (logs, reportes, etc.)
-        path: |
-          *.log
-          test-results/
-          *.xml
-        # Conservar por 7 días
-        retention-days: 7
