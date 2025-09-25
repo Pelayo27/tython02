@@ -1,0 +1,67 @@
+# Nombre que aparece en GitHub Actions
+name: Python CI Básico
+
+# Cuándo se ejecuta el script
+on:
+  # En cada push a main
+  push:
+    branches: [ main ]
+  # En pull requests hacia main
+  pull_request:
+    branches: [ main ]
+
+# Define el trabajo a realizar
+jobs:
+  test:
+    # Sistema operativo donde correr
+    runs-on: ubuntu-latest
+    
+    # Pasos a ejecutar en orden
+    steps:
+    # Paso 1: Descargar el código del repositorio
+    - name: Descargar código
+      uses: actions/checkout@v4
+    
+    # Paso 2: Instalar Python 3.10
+    - name: Instalar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    # Paso 3: Instalar dependencias
+    - name: Instalar dependencias
+      run: |
+        # Actualizar pip
+        python -m pip install --upgrade pip
+        # Instalar herramientas básicas
+        pip install flake8 pytest
+        # Instalar dependencias del proyecto si existen
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    # Paso 4: Verificar sintaxis y estilo básico
+    - name: Verificar código con flake8
+      run: |
+        # Verificar errores de sintaxis y estilo básico
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    
+    # Paso 5: Ejecutar tests
+    - name: Ejecutar tests
+      run: |
+        # Buscar y ejecutar todos los tests
+        pytest
+    
+    # Paso 6: Subir archivos/resultados
+    - name: Subir resultados
+      uses: actions/upload-artifact@v3
+      # Ejecutar incluso si algo falla arriba
+      if: always()
+      with:
+        # Nombre del archivo comprimido
+        name: test-results
+        # Qué archivos subir (logs, reportes, etc.)
+        path: |
+          *.log
+          test-results/
+          *.xml
+        # Conservar por 7 días
+        retention-days: 7
